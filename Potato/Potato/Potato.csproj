@@ -91,6 +91,7 @@
     <Compile Include="_ThreadHelper.cs" />
     <Compile Include="_LocalToken.cs" />
     <Compile Include="_EnablePriv.cs" />
+    <Compile Include="_RevShell.cs" />
     <Compile Include="TestClass.cs" />
     <Compile Include="ComUtils.cs" />
     <Compile Include="DCERPCNtlmHandler.cs" />
